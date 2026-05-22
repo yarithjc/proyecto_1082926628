@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import type { LoginFormData, LoginState } from './Login.types';
+import styles from './Login.module.css';
 
 /**
  * Componente Login — Página de autenticación
@@ -10,7 +11,7 @@ import type { LoginFormData, LoginState } from './Login.types';
  * - Client component (estado local)
  * - Validación básica de email/password
  * - Estados: idle, loading, success, error
- * - Diseño consistente con paleta del proyecto (indigo/violeta)
+ * - Diseño moderno con gradiente y animaciones
  * - Listo para conectar a Supabase Auth
  */
 
@@ -72,30 +73,26 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-950 flex items-center justify-center p-4">
+    <div className={styles.container}>
       {/* Fondo con efecto glow */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-r from-indigo-500/20 to-purple-500/20 rounded-full blur-3xl opacity-50"></div>
-      </div>
+      <div className={styles.glowBackground}></div>
 
       {/* Contenedor del formulario */}
-      <div className="relative w-full max-w-md">
-        <div className="bg-gray-900/80 backdrop-blur border border-gray-800 rounded-2xl p-8 shadow-2xl">
+      <div className={styles.cardWrapper}>
+        <div className={styles.card}>
           {/* Header */}
-          <div className="text-center mb-8">
-            <h1 className="text-4xl font-extrabold tracking-tight mb-2">
-              <span className="bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
-                Login
-              </span>
+          <div className={styles.header}>
+            <h1 className={styles.title}>
+              Accede a tu cuenta
             </h1>
-            <p className="text-gray-400 text-sm">Accede a tu cuenta</p>
+            <p className={styles.subtitle}>Sistema fullstack con TypeScript y Next.js</p>
           </div>
 
           {/* Formulario */}
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleSubmit} className={styles.form}>
             {/* Email Input */}
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
+            <div className={styles.formGroup}>
+              <label htmlFor="email" className={styles.label}>
                 Email
               </label>
               <input
@@ -106,13 +103,13 @@ export default function Login() {
                 onChange={handleChange}
                 disabled={state === 'loading'}
                 placeholder="tu@email.com"
-                className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed transition"
+                className={styles.input}
               />
             </div>
 
             {/* Password Input */}
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-2">
+            <div className={styles.formGroup}>
+              <label htmlFor="password" className={styles.label}>
                 Contraseña
               </label>
               <input
@@ -123,21 +120,21 @@ export default function Login() {
                 onChange={handleChange}
                 disabled={state === 'loading'}
                 placeholder="••••••••"
-                className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed transition"
+                className={styles.input}
               />
             </div>
 
             {/* Error Message */}
             {error && (
-              <div className="p-4 bg-red-900/30 border border-red-700/50 rounded-lg">
-                <p className="text-sm text-red-300">❌ {error}</p>
+              <div className={styles.errorMessage}>
+                <p>❌ {error}</p>
               </div>
             )}
 
             {/* Success Message */}
             {state === 'success' && (
-              <div className="p-4 bg-green-900/30 border border-green-700/50 rounded-lg">
-                <p className="text-sm text-green-300">✅ ¡Bienvenido! Redirigiendo...</p>
+              <div className={styles.successMessage}>
+                <p>✅ ¡Bienvenido! Redirigiendo...</p>
               </div>
             )}
 
@@ -145,9 +142,31 @@ export default function Login() {
             <button
               type="submit"
               disabled={state === 'loading' || state === 'success'}
-              className="w-full py-3 px-4 mt-6 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 disabled:from-gray-600 disabled:to-gray-600 disabled:cursor-not-allowed text-white font-semibold rounded-lg transition duration-200 flex items-center justify-center gap-2"
+              className={styles.button}
             >
               {state === 'loading' ? (
+                <>
+                  <span className={styles.spinner}></span>
+                  Iniciando sesión...
+                </>
+              ) : state === 'success' ? (
+                'Sesión iniciada'
+              ) : (
+                'Iniciar Sesión'
+              )}
+            </button>
+
+            {/* Links */}
+            <div className={styles.links}>
+              <a href="#" className={styles.link}>¿No tienes cuenta? Regístrate aquí</a>
+              <a href="#" className={styles.link}>Listo para conectar a Supabase Auth</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  );
+}
                 <>
                   <span className="animate-spin">⏳</span>
                   Iniciando sesión...
