@@ -14,32 +14,22 @@
   inset: 0;
   overflow: hidden;
   pointer-events: none;
-  background: linear-gradient(135deg, #0f172a 0%, #2d1b69 50%, #0f172a 100%);
+  background: #7f1d1d;
 }
 
+/* Patrón geométrico sutil en el fondo rojo */
 .glowBackground::before {
   content: '';
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 384px;
-  height: 384px;
-  background: radial-gradient(circle, rgba(168, 85, 247, 0.3) 0%, transparent 70%);
-  filter: blur(80px);
-  opacity: 0.8;
-  animation: glow-pulse 4s ease-in-out infinite;
-}
-
-@keyframes glow-pulse {
-  0%, 100% {
-    opacity: 0.5;
-    filter: blur(80px);
-  }
-  50% {
-    opacity: 1;
-    filter: blur(60px);
-  }
+  inset: 0;
+  background-image: 
+    linear-gradient(45deg, rgba(220, 38, 38, 0.08) 25%, transparent 25%),
+    linear-gradient(-45deg, rgba(220, 38, 38, 0.08) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, rgba(220, 38, 38, 0.08) 75%),
+    linear-gradient(-45deg, transparent 75%, rgba(220, 38, 38, 0.08) 75%);
+  background-size: 40px 40px;
+  background-position: 0 0, 0 20px, 20px -20px, -20px 0px;
+  pointer-events: none;
 }
 
 .cardWrapper {
@@ -53,13 +43,11 @@
 
 .card {
   width: 100%;
-  background: rgba(30, 27, 77, 0.6);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(168, 85, 247, 0.25);
-  border-radius: 16px;
-  padding: 2rem;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3),
-              inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  background: #ffffff;
+  border-left: 6px solid #dc2626;
+  border-radius: 8px;
+  padding: 2.5rem 2rem;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
   animation: fade-in 0.6s ease forwards;
 }
 
@@ -77,24 +65,34 @@
 .header {
   text-align: center;
   margin-bottom: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.knifeLogo {
+  width: 60px;
+  height: 60px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .title {
-  font-size: 1.875rem;
-  font-weight: 700;
-  letter-spacing: -0.5px;
-  margin-bottom: 0.5rem;
-  background: linear-gradient(135deg, #a78bfa 0%, #d8b4fe 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  color: transparent;
+  font-size: 1.75rem;
+  font-weight: 600;
+  letter-spacing: -0.3px;
+  color: #1f2937;
+  margin: 0;
 }
 
 .subtitle {
-  font-size: 0.875rem;
-  color: #cbd5e1;
+  font-size: 0.8rem;
+  color: #6b7280;
   font-weight: 400;
+  margin: 0;
 }
 
 .form {
@@ -112,62 +110,66 @@
 .label {
   font-size: 0.875rem;
   font-weight: 600;
-  color: #e2e8f0;
+  color: #374151;
 }
 
 .input {
   width: 100%;
-  padding: 0.875rem;
-  background: rgba(15, 23, 42, 0.4);
-  border: 1px solid rgba(168, 85, 247, 0.3);
+  padding: 0.875rem 0.875rem;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
   border-radius: 0.5rem;
-  color: #e2e8f0;
+  color: #1f2937;
   font-size: 0.95rem;
-  transition: all 0.3s ease;
+  font-family: inherit;
+  transition: all 0.2s ease;
 }
 
 .input::placeholder {
-  color: #94a3b8;
+  color: #9ca3af;
 }
 
 .input:focus {
   outline: none;
-  border-color: #a855f7;
-  background: rgba(15, 23, 42, 0.6);
-  box-shadow: 0 0 20px rgba(168, 85, 247, 0.4);
+  border-color: #dc2626;
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
 }
 
 .input:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+  background: #f3f4f6;
 }
 
 .errorMessage {
-  padding: 1rem;
-  background: rgba(127, 29, 29, 0.2);
-  border: 1px solid rgba(220, 38, 38, 0.4);
+  padding: 0.875rem;
+  background: #fee2e2;
+  border: 1px solid #fecaca;
   border-radius: 0.5rem;
   animation: slide-down 0.3s ease;
 }
 
 .errorMessage p {
   font-size: 0.875rem;
-  color: #fca5a5;
+  color: #991b1b;
   margin: 0;
+  font-weight: 500;
 }
 
 .successMessage {
-  padding: 1rem;
-  background: rgba(20, 83, 45, 0.2);
-  border: 1px solid rgba(34, 197, 94, 0.4);
+  padding: 0.875rem;
+  background: #dcfce7;
+  border: 1px solid #bbf7d0;
   border-radius: 0.5rem;
   animation: slide-down 0.3s ease;
 }
 
 .successMessage p {
   font-size: 0.875rem;
-  color: #86efac;
+  color: #166534;
   margin: 0;
+  font-weight: 500;
 }
 
 @keyframes slide-down {
@@ -185,26 +187,27 @@
   width: 100%;
   padding: 0.875rem 1rem;
   margin-top: 1.5rem;
-  background: linear-gradient(135deg, #a855f7 0%, #7c3aed 100%);
+  background: #dc2626;
   border: none;
   border-radius: 0.5rem;
   color: white;
   font-weight: 600;
   font-size: 0.95rem;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
   position: relative;
   overflow: hidden;
+  font-family: inherit;
 }
 
 .button:hover:not(:disabled) {
-  background: linear-gradient(135deg, #9333ea 0%, #6d28d9 100%);
+  background: #b91c1c;
   transform: translateY(-2px);
-  box-shadow: 0 10px 30px rgba(168, 85, 247, 0.4);
+  box-shadow: 0 10px 30px rgba(220, 38, 38, 0.3);
 }
 
 .button:active:not(:disabled) {
@@ -212,9 +215,9 @@
 }
 
 .button:disabled {
-  background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+  background: #d1d5db;
   cursor: not-allowed;
-  opacity: 0.7;
+  opacity: 0.8;
 }
 
 .spinner {
@@ -242,23 +245,23 @@
 }
 
 .link {
-  font-size: 0.8rem;
-  color: #cbd5e1;
+  font-size: 0.75rem;
+  color: #9ca3af;
   text-decoration: none;
-  transition: color 0.3s ease;
+  transition: color 0.2s ease;
   border-bottom: 1px solid transparent;
   display: inline-block;
   padding-bottom: 0.125rem;
 }
 
 .link:hover {
-  color: #a78bfa;
-  border-bottom-color: #a78bfa;
+  color: #dc2626;
+  border-bottom-color: #dc2626;
 }
 
 @media (max-width: 640px) {
   .card {
-    padding: 1.5rem;
+    padding: 2rem 1.5rem;
   }
 
   .title {

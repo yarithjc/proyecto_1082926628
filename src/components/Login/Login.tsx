@@ -82,10 +82,29 @@ export default function Login() {
         <div className={styles.card}>
           {/* Header */}
           <div className={styles.header}>
+            {/* Logo: Cuchillo con checkbox */}
+            <svg 
+              className={styles.knifeLogo}
+              viewBox="0 0 60 60" 
+              fill="none" 
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              {/* Cuchillo */}
+              <path 
+                d="M30 5L28 15L28 45C28 48.3137 30.6863 51 34 51C37.3137 51 40 48.3137 40 45V15L38 5H30Z" 
+                fill="#dc2626" 
+                stroke="#991b1b" 
+                strokeWidth="1"
+              />
+              {/* Checkbox */}
+              <rect x="10" y="35" width="14" height="14" rx="2" fill="none" stroke="#16a34a" strokeWidth="1.5"/>
+              <path d="M13 43L16 46L23 39" stroke="#16a34a" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+            </svg>
+
             <h1 className={styles.title}>
               Accede a tu cuenta
             </h1>
-            <p className={styles.subtitle}>Sistema fullstack con TypeScript y Next.js</p>
+            <p className={styles.subtitle}>Sistema de gestión de stock para salsamentaría</p>
           </div>
 
           {/* Formulario */}
@@ -155,12 +174,6 @@ export default function Login() {
                 'Iniciar Sesión'
               )}
             </button>
-
-            {/* Links */}
-            <div className={styles.links}>
-              <a href="#" className={styles.link}>¿No tienes cuenta? Regístrate aquí</a>
-              <a href="#" className={styles.link}>Listo para conectar a Supabase Auth</a>
-            </div>
           </form>
         </div>
       </div>
