@@ -6,6 +6,14 @@
   .glow-text {
     text-shadow: 0 0 30px #6366f1, 0 0 80px #6366f1;
   }
+
+  .container-main {
+    @apply flex items-center justify-center min-h-screen bg-gradient-to-br from-slate-950 via-purple-900 to-slate-950;
+  }
+
+  .card-style {
+    @apply rounded-lg shadow-2xl p-8 bg-slate-900/50 backdrop-blur-md border border-purple-500/20;
+  }
 }
 
 * {
@@ -14,8 +22,67 @@
   padding: 0;
 }
 
-html,
+html {
+  height: 100%;
+  scroll-behavior: smooth;
+}
+
 body {
   height: 100%;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0f172a 0%, #2d1b69 50%, #0f172a 100%);
+  color: #e2e8f0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#__next {
+  height: 100%;
+  min-height: 100vh;
+}
+
+/* Estilos globales para inputs */
+input,
+textarea,
+select {
+  @apply bg-slate-800/50 border border-purple-500/30 text-white rounded placeholder-slate-400;
+  transition: all 0.3s ease;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  @apply outline-none border-purple-500 bg-slate-800/80;
+  box-shadow: 0 0 20px rgba(168, 85, 247, 0.3);
+}
+
+/* Estilos globales para botones */
+button {
+  transition: all 0.3s ease;
+}
+
+button:hover {
+  transform: translateY(-2px);
+}
+
+/* Scrollbar personalizado */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.5);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(168, 85, 247, 0.5);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(168, 85, 247, 0.7);
 }
 
