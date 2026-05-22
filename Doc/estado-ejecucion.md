@@ -32,6 +32,37 @@
 
 ---
 
+## CAMBIOS ADICIONALES (22 de mayo de 2026)
+
+### Cambio 1: Reemplazar HolaMundo por componente Login
+
+**Fecha:** 22 de mayo de 2026  
+**Ejecutor:** Ingeniero Fullstack Senior  
+**Descripción:** Se reemplazó el componente HolaMundo (página de bienvenida) con un nuevo componente Login que proporciona:
+- Formulario de autenticación con email y password
+- Validaciones básicas (email formato, contraseña mínimo 6 caracteres)
+- Estados de UI: idle, loading, success, error
+- Diseño responsivo usando Tailwind CSS (tema oscuro indigo/violeta)
+- Listo para integrar con Supabase Auth
+
+**Archivos creados:**
+- [src/components/Login/Login.tsx](../src/components/Login/Login.tsx) — Componente principal (client)
+- [src/components/Login/Login.types.ts](../src/components/Login/Login.types.ts) — Tipos TypeScript
+
+**Archivos modificados:**
+- [src/app/page.tsx](../src/app/page.tsx) — Cambió de Server Component a Client Component, ahora importa Login
+
+**Validación:**
+- ✅ Build exitoso sin errores (`npm run build`)
+- ✅ Servidor de desarrollo funciona (`npm run dev`)
+- ✅ Formulario acepta entrada de usuario
+- ✅ Estados visuales funcionan (loading, success, error)
+- ✅ TypeScript strict mode sin errores
+
+**Estado:** ✅ COMPLETADO
+
+---
+
 ## Leyenda de Estados
 
 | Ícono | Estado | Descripción |
