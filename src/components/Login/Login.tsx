@@ -167,39 +167,3 @@ export default function Login() {
     </div>
   );
 }
-                <>
-                  <span className="animate-spin">⏳</span>
-                  Iniciando sesión...
-                </>
-              ) : state === 'success' ? (
-                <>
-                  <span>✅</span>
-                  Acceso concedido
-                </>
-              ) : (
-                'Iniciar Sesión'
-              )}
-            </button>
-          </form>
-
-          {/* Footer */}
-          <div className="mt-6 pt-6 border-t border-gray-800">
-            <p className="text-center text-gray-400 text-sm">
-              ¿No tienes cuenta?{' '}
-              <a href="#" className="text-indigo-400 hover:text-indigo-300 font-medium transition">
-                Regístrate aquí
-              </a>
-            </p>
-          </div>
-        </div>
-
-        {/* Información de desarrollo */}
-        <div className="mt-6 p-4 bg-gray-900/50 border border-gray-800 rounded-lg">
-          <p className="text-xs text-gray-500 font-mono text-center">
-            🚀 Listo para conectar a Supabase Auth
-          </p>
-        </div>
-      </div>
-    </div>
-  );
-}
