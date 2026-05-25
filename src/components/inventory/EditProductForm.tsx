@@ -3,24 +3,24 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, DollarSign, Boxes, AlertCircle, Check } from 'lucide-react';
+import { ArrowLeft, DollarSign, Boxes, AlertCircle } from 'lucide-react';
 import type { Product } from '@/lib/types';
 import { Button } from '@/components/ui/Button';
 import { Card, CardBody, CardHeader, CardTitle } from '@/components/ui/Card';
+import { useToast } from '@/components/ui/Toast';
 import { formatCOP } from '@/lib/dateUtils';
 
 export function EditProductForm({ product }: { product: Product }) {
   const router = useRouter();
+  const toast = useToast();
   const [price, setPrice] = useState(String(Number(product.price)));
   const [addStock, setAddStock] = useState('');
   const [busy, setBusy] = useState<null | 'price' | 'stock'>(null);
   const [error, setError] = useState<string | null>(null);
-  const [ok, setOk] = useState<string | null>(null);
 
   async function updatePrice(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
-    setOk(null);
     const v = Number(price);
     if (!Number.isFinite(v) || v <= 0) return setError('Precio debe ser mayor a 0');
     setBusy('price');
@@ -31,8 +31,11 @@ export function EditProductForm({ product }: { product: Product }) {
         body: JSON.stringify({ kind: 'price', price: v }),
       });
       const json = await res.json();
-      if (!res.ok) return setError(json.error ?? 'No se pudo actualizar el precio');
-      setOk('Precio actualizado');
+      if (!res.ok) {
+        toast.error('No se pudo actualizar', json.error);
+        return setError(json.error ?? 'No se pudo actualizar el precio');
+      }
+      toast.success('Precio actualizado', formatCOP(v));
       router.refresh();
     } finally {
       setBusy(null);
@@ -42,7 +45,6 @@ export function EditProductForm({ product }: { product: Product }) {
   async function addToStock(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
-    setOk(null);
     const v = Number(addStock);
     if (!Number.isInteger(v) || v < 1) return setError('Ingresa una cantidad entera ≥ 1');
     setBusy('stock');
@@ -53,8 +55,11 @@ export function EditProductForm({ product }: { product: Product }) {
         body: JSON.stringify({ kind: 'stock', quantity: v }),
       });
       const json = await res.json();
-      if (!res.ok) return setError(json.error ?? 'No se pudo actualizar el stock');
-      setOk(`+${v} unidades agregadas`);
+      if (!res.ok) {
+        toast.error('No se pudo actualizar', json.error);
+        return setError(json.error ?? 'No se pudo actualizar el stock');
+      }
+      toast.success(`+${v} unidades agregadas`, product.name);
       setAddStock('');
       router.refresh();
     } finally {
@@ -80,11 +85,6 @@ export function EditProductForm({ product }: { product: Product }) {
         </p>
       </div>
 
-      {ok && (
-        <div className="flex items-center gap-2 text-sm text-green-800 bg-green-50 border border-green-200 rounded-lg px-3 py-2">
-          <Check size={16} /> {ok}
-        </div>
-      )}
       {error && (
         <div className="flex items-start gap-2 text-sm text-red-700 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
           <AlertCircle size={16} className="shrink-0 mt-0.5" /> {error}

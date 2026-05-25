@@ -6,9 +6,11 @@ import { ArrowLeft, Save, AlertCircle } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/Button';
 import { Card, CardBody, CardHeader, CardTitle } from '@/components/ui/Card';
+import { useToast } from '@/components/ui/Toast';
 
 export function ProductForm() {
   const router = useRouter();
+  const toast = useToast();
   const [name, setName] = useState('');
   const [price, setPrice] = useState('');
   const [stock, setStock] = useState('');
@@ -33,8 +35,10 @@ export function ProductForm() {
       const json = await res.json();
       if (!res.ok) {
         setError(json.error ?? 'No se pudo crear el producto');
+        toast.error('No se pudo crear', json.error);
         return;
       }
+      toast.success('Producto creado', `"${name.trim()}" agregado al inventario`);
       router.push('/inventory');
       router.refresh();
     } catch {

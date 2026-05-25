@@ -6,9 +6,11 @@ import { Plus, Search, PackageX, AlertTriangle } from 'lucide-react';
 import type { Product, Role } from '@/lib/types';
 import { Button } from '@/components/ui/Button';
 import { EmptyState } from '@/components/ui/EmptyState';
+import { useToast } from '@/components/ui/Toast';
 import { ProductRow } from './ProductRow';
 
 export function InventoryClient({ role }: { role: Role }) {
+  const toast = useToast();
   const [products, setProducts] = useState<Product[]>([]);
   const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(true);
@@ -22,12 +24,16 @@ export function InventoryClient({ role }: { role: Role }) {
       .then((j) => {
         if (!cancelled) setProducts(j.products ?? []);
       })
-      .catch(() => !cancelled && setError('No se pudo cargar el inventario'))
+      .catch(() => {
+        if (cancelled) return;
+        setError('No se pudo cargar el inventario');
+        toast.error('No se pudo cargar el inventario');
+      })
       .finally(() => !cancelled && setLoading(false));
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [toast]);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();

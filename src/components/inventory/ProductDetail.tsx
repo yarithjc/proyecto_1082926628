@@ -14,6 +14,8 @@ import type { Product, Role, SaleWithProduct } from '@/lib/types';
 import { Card, CardBody, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Badge, StockBadge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
+import { useToast } from '@/components/ui/Toast';
+import { useConfirm } from '@/components/ui/Modal';
 import { formatCOP, formatDateTime } from '@/lib/dateUtils';
 
 interface Props {
@@ -24,20 +26,29 @@ interface Props {
 
 export function ProductDetail({ product, role, sales }: Props) {
   const router = useRouter();
+  const toast = useToast();
+  const { confirm } = useConfirm();
   const [deactivating, setDeactivating] = useState(false);
 
   async function handleDeactivate() {
-    if (!confirm(`¿Desactivar "${product.name}"? No aparecerá más en el inventario activo.`)) {
-      return;
-    }
+    const ok = await confirm({
+      title: `Desactivar "${product.name}"`,
+      description:
+        'Ya no aparecerá en el inventario activo ni podrá venderse. El historial de ventas previo se conserva intacto.',
+      confirmLabel: 'Sí, desactivar',
+      tone: 'danger',
+      icon: <PowerOff size={22} />,
+    });
+    if (!ok) return;
     setDeactivating(true);
     const res = await fetch(`/api/products/${product.id}`, { method: 'DELETE' });
     if (res.ok) {
+      toast.success('Producto desactivado', product.name);
       router.push('/inventory');
       router.refresh();
     } else {
       const j = await res.json().catch(() => ({}));
-      alert(j.error ?? 'No se pudo desactivar');
+      toast.error('No se pudo desactivar', j.error);
       setDeactivating(false);
     }
   }

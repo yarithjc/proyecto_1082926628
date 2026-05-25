@@ -1,10 +1,11 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { Search, ShoppingBag, AlertCircle, Check, X } from 'lucide-react';
+import { Search, ShoppingBag, AlertCircle, X } from 'lucide-react';
 import type { Product, SaleWithProduct } from '@/lib/types';
 import { Button } from '@/components/ui/Button';
 import { StockBadge } from '@/components/ui/Badge';
+import { useToast } from '@/components/ui/Toast';
 import { formatCOP } from '@/lib/dateUtils';
 
 interface Props {
@@ -12,6 +13,7 @@ interface Props {
 }
 
 export function SaleForm({ onSold }: Props) {
+  const toast = useToast();
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<Product[]>([]);
   const [open, setOpen] = useState(false);
@@ -19,7 +21,6 @@ export function SaleForm({ onSold }: Props) {
   const [qty, setQty] = useState('1');
   const [loadingSubmit, setLoadingSubmit] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
   const searchRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -60,7 +61,6 @@ export function SaleForm({ onSold }: Props) {
     e.preventDefault();
     if (!selected || !canSubmit) return;
     setError(null);
-    setSuccess(null);
     setLoadingSubmit(true);
     try {
       const res = await fetch('/api/sales', {
@@ -71,13 +71,19 @@ export function SaleForm({ onSold }: Props) {
       const j = await res.json();
       if (!res.ok) {
         if (res.status === 409 && j.details?.available !== undefined) {
-          setError(`Stock insuficiente — hay ${j.details.available} u disponibles.`);
+          const msg = `Stock insuficiente — hay ${j.details.available} u disponibles.`;
+          setError(msg);
+          toast.error('Stock insuficiente', `Disponibles: ${j.details.available}`);
         } else {
           setError(j.error ?? 'No se pudo registrar la venta');
+          toast.error('No se pudo registrar la venta', j.error);
         }
         return;
       }
-      setSuccess(`✓ Venta registrada — ${formatCOP(total)}`);
+      toast.success(
+        `Venta registrada · ${formatCOP(total)}`,
+        `${qtyNum} × ${selected.name}`
+      );
       onSold({
         ...j.sale,
         product_name: selected.name,
@@ -87,7 +93,6 @@ export function SaleForm({ onSold }: Props) {
       setQuery('');
       setQty('1');
       setResults([]);
-      setTimeout(() => setSuccess(null), 3000);
     } finally {
       setLoadingSubmit(false);
     }
@@ -210,11 +215,6 @@ export function SaleForm({ onSold }: Props) {
         <div className="flex items-start gap-2 text-sm text-red-700 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
           <AlertCircle size={16} className="shrink-0 mt-0.5" />
           <span>{error}</span>
-        </div>
-      )}
-      {success && (
-        <div className="flex items-center gap-2 text-sm text-green-800 bg-green-50 border border-green-200 rounded-lg px-3 py-2">
-          <Check size={16} /> {success}
         </div>
       )}
 

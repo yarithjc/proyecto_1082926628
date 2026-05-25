@@ -4,9 +4,11 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { LogIn, Mail, Lock, AlertCircle } from 'lucide-react';
 import { Logo } from '@/components/ui/Logo';
+import { useToast } from '@/components/ui/Toast';
 
 export default function LoginPage() {
   const router = useRouter();
+  const toast = useToast();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -27,6 +29,7 @@ export default function LoginPage() {
         setError(json.error ?? 'Credenciales inválidas');
         return;
       }
+      toast.success(`Bienvenido, ${json.user?.name ?? 'usuario'}`);
       if (json.user?.mustChangePassword) {
         router.push('/profile?force=1');
       } else {

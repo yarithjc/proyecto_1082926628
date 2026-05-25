@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Card, CardBody, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Logo } from '@/components/ui/Logo';
+import { useToast } from '@/components/ui/Toast';
 import type { Role } from '@/lib/types';
 
 interface Props {
@@ -14,18 +15,17 @@ interface Props {
 
 export function ProfileClient({ user, forced }: Props) {
   const router = useRouter();
+  const toast = useToast();
   const [current, setCurrent] = useState('');
   const [next, setNext] = useState('');
-  const [confirm, setConfirm] = useState('');
+  const [confirmPass, setConfirmPass] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
-    setSuccess(null);
-    if (next !== confirm) {
+    if (next !== confirmPass) {
       setError('Las contraseñas no coinciden');
       return;
     }
@@ -42,16 +42,18 @@ export function ProfileClient({ user, forced }: Props) {
       });
       const json = await res.json();
       if (!res.ok) {
+        toast.error('No se pudo cambiar', json.error);
         setError(json.error ?? 'No se pudo cambiar la contraseña');
         return;
       }
-      setSuccess('Contraseña actualizada');
+      toast.success('Contraseña actualizada', 'Te llevamos al inicio…');
       setCurrent('');
       setNext('');
-      setConfirm('');
+      setConfirmPass('');
       router.refresh();
-      setTimeout(() => router.push('/dashboard'), 600);
+      setTimeout(() => router.push('/dashboard'), 800);
     } catch {
+      toast.error('No se pudo conectar');
       setError('No se pudo conectar');
     } finally {
       setLoading(false);
@@ -118,19 +120,14 @@ export function ProfileClient({ user, forced }: Props) {
                 <input
                   type="password"
                   required
-                  value={confirm}
-                  onChange={(e) => setConfirm(e.target.value)}
+                  value={confirmPass}
+                  onChange={(e) => setConfirmPass(e.target.value)}
                   className="w-full px-3 py-2.5 rounded-lg border border-stone-300 focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/30"
                 />
               </label>
               {error && (
                 <div className="text-sm text-red-700 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
                   {error}
-                </div>
-              )}
-              {success && (
-                <div className="text-sm text-green-700 bg-green-50 border border-green-200 rounded-lg px-3 py-2">
-                  {success}
                 </div>
               )}
               <Button type="submit" disabled={loading} className="w-full">

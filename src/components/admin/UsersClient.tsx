@@ -14,9 +14,13 @@ import type { Role, SafeUser } from '@/lib/types';
 import { Card, CardBody } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
+import { useToast } from '@/components/ui/Toast';
+import { useConfirm } from '@/components/ui/Modal';
 import { formatDateTime } from '@/lib/dateUtils';
 
 export function UsersClient({ currentUserId }: { currentUserId: string }) {
+  const toast = useToast();
+  const { confirm } = useConfirm();
   const [users, setUsers] = useState<SafeUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [showNew, setShowNew] = useState(false);
@@ -54,8 +58,10 @@ export function UsersClient({ currentUserId }: { currentUserId: string }) {
       const j = await res.json();
       if (!res.ok) {
         setError(j.error ?? 'No se pudo crear el usuario');
+        toast.error('No se pudo crear', j.error);
         return;
       }
+      toast.success('Usuario creado', `${j.user.email} (${j.user.role})`);
       setTempPassword({ email: j.user.email, password: j.tempPassword });
       setName('');
       setEmail('');
@@ -69,12 +75,27 @@ export function UsersClient({ currentUserId }: { currentUserId: string }) {
 
   async function toggle(u: SafeUser) {
     const next = !u.is_active;
+    const ok = await confirm({
+      title: next ? `Activar a ${u.name}` : `Suspender a ${u.name}`,
+      description: next
+        ? 'Volverá a poder iniciar sesión y operar el sistema.'
+        : 'No podrá iniciar sesión hasta que lo reactives.',
+      confirmLabel: next ? 'Activar' : 'Suspender',
+      tone: next ? 'default' : 'danger',
+    });
+    if (!ok) return;
     const res = await fetch(`/api/users/${u.id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ is_active: next }),
     });
-    if (res.ok) load();
+    if (res.ok) {
+      toast.success(next ? 'Usuario activado' : 'Usuario suspendido', u.email);
+      load();
+    } else {
+      const j = await res.json().catch(() => ({}));
+      toast.error('No se pudo actualizar', j.error);
+    }
   }
 
   return (
