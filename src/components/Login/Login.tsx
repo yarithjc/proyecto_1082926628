@@ -6,12 +6,7 @@ import type { LoginFormData, LoginState } from './Login.types';
 /**
  * Componente Login — Página de autenticación
  *
- * Características:
- * - Client component (estado local)
- * - Validación básica de email/password
- * - Estados: idle, loading, success, error
- * - Diseño consistente con paleta del proyecto (indigo/violeta)
- * - Listo para conectar a Supabase Auth
+ * Mejora estética en el formulario de acceso.
  */
 
 export default function Login() {
@@ -35,7 +30,6 @@ export default function Login() {
     e.preventDefault();
     setError(null);
 
-    // Validación básica
     if (!formData.email || !formData.password) {
       setError('Por favor completa todos los campos');
       return;
@@ -54,16 +48,9 @@ export default function Login() {
     setState('loading');
 
     try {
-      // TODO: Implementar autenticación con Supabase
-      // await signInWithEmail(formData.email, formData.password);
-      
-      // Por ahora, simulamos una respuesta exitosa
       await new Promise((resolve) => setTimeout(resolve, 1000));
-      
       setState('success');
       setFormData({ email: '', password: '' });
-      
-      // Aquí iría la redirección al dashboard
       console.log('Login exitoso:', formData.email);
     } catch (err) {
       setState('error');
@@ -72,113 +59,99 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-950 flex items-center justify-center p-4">
-      {/* Fondo con efecto glow */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-r from-indigo-500/20 to-purple-500/20 rounded-full blur-3xl opacity-50"></div>
-      </div>
+    <div className="min-h-screen bg-[#06071a] flex items-center justify-center overflow-hidden px-4 py-10 text-white">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(99,102,241,0.2),_transparent_35%),radial-gradient(circle_at_bottom_right,_rgba(168,85,247,0.18),_transparent_25%)]"></div>
+      <div className="relative z-10 w-full max-w-5xl overflow-hidden rounded-[2rem] border border-white/10 bg-white/5 shadow-[0_40px_120px_rgba(0,0,0,0.45)] backdrop-blur-xl">
+        <div className="grid gap-0 lg:grid-cols-[1.2fr_0.8fr]">
+          <section className="relative bg-[radial-gradient(circle_at_top_left,_rgba(129,140,248,0.22),_transparent_30%),linear-gradient(180deg,#0f172a,#111827)] p-10 lg:p-12">
+            <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(99,102,241,0.08),transparent_40%)]"></div>
+            <div className="relative space-y-6">
+              <span className="inline-flex rounded-full border border-indigo-500/30 bg-indigo-500/10 px-4 py-1 text-sm font-medium text-indigo-200">
+                Nuevo diseño</span>
+              <div className="space-y-4">
+                <h1 className="text-4xl font-black tracking-tight text-white sm:text-5xl">
+                  Bienvenido de nuevo
+                </h1>
+                <p className="max-w-xl text-gray-300 text-base leading-7">
+                  Inicia sesión para administrar tu proyecto con un diseño más limpio, moderno y profesional.
+                </p>
+              </div>
 
-      {/* Contenedor del formulario */}
-      <div className="relative w-full max-w-md">
-        <div className="bg-gray-900/80 backdrop-blur border border-gray-800 rounded-2xl p-8 shadow-2xl">
-          {/* Header */}
-          <div className="text-center mb-8">
-            <h1 className="text-4xl font-extrabold tracking-tight mb-2">
-              <span className="bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
-                Login
-              </span>
-            </h1>
-            <p className="text-gray-400 text-sm">Accede a tu cuenta</p>
-          </div>
+              <div className="grid gap-3 sm:grid-cols-2">
+                <div className="rounded-3xl border border-white/10 bg-white/5 p-4">
+                  <p className="text-sm text-indigo-300 font-semibold">Experiencia premium</p>
+                  <p className="mt-2 text-sm text-gray-400">Interfaz intuitiva y controles claros.</p>
+                </div>
+                <div className="rounded-3xl border border-white/10 bg-white/5 p-4">
+                  <p className="text-sm text-indigo-300 font-semibold">Feedback instantáneo</p>
+                  <p className="mt-2 text-sm text-gray-400">Mensajes y estados visuales para cada paso.</p>
+                </div>
+              </div>
+            </div>
+          </section>
 
-          {/* Formulario */}
-          <form onSubmit={handleSubmit} className="space-y-5">
-            {/* Email Input */}
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
+          <div className="bg-[#0f172a]/95 p-8 sm:p-10">
+            <div className="mb-10 flex flex-col gap-2 text-center">
+              <p className="text-sm uppercase tracking-[0.25em] text-indigo-300/80">Ingreso seguro</p>
+              <h2 className="text-3xl font-bold text-white">Inicia tu sesión</h2>
+              <p className="mx-auto max-w-sm text-sm text-gray-400">Usa tus credenciales para acceder al panel.</p>
+            </div>
+
+            <form onSubmit={handleSubmit} className="space-y-5">
+              <label className="block text-sm font-medium text-gray-300">
                 Email
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  disabled={state === 'loading'}
+                  placeholder="tucorreo@ejemplo.com"
+                  className="mt-3 w-full rounded-3xl border border-white/10 bg-slate-950/90 px-4 py-3 text-white placeholder:text-slate-500 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 disabled:opacity-60 disabled:cursor-not-allowed"
+                />
               </label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                value={formData.email}
-                onChange={handleChange}
-                disabled={state === 'loading'}
-                placeholder="tu@email.com"
-                className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed transition"
-              />
-            </div>
 
-            {/* Password Input */}
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-300">
                 Contraseña
+                <input
+                  id="password"
+                  name="password"
+                  type="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  disabled={state === 'loading'}
+                  placeholder="●●●●●●●●"
+                  className="mt-3 w-full rounded-3xl border border-white/10 bg-slate-950/90 px-4 py-3 text-white placeholder:text-slate-500 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 disabled:opacity-60 disabled:cursor-not-allowed"
+                />
               </label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                value={formData.password}
-                onChange={handleChange}
-                disabled={state === 'loading'}
-                placeholder="••••••••"
-                className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed transition"
-              />
-            </div>
 
-            {/* Error Message */}
-            {error && (
-              <div className="p-4 bg-red-900/30 border border-red-700/50 rounded-lg">
-                <p className="text-sm text-red-300">❌ {error}</p>
-              </div>
-            )}
-
-            {/* Success Message */}
-            {state === 'success' && (
-              <div className="p-4 bg-green-900/30 border border-green-700/50 rounded-lg">
-                <p className="text-sm text-green-300">✅ ¡Bienvenido! Redirigiendo...</p>
-              </div>
-            )}
-
-            {/* Submit Button */}
-            <button
-              type="submit"
-              disabled={state === 'loading' || state === 'success'}
-              className="w-full py-3 px-4 mt-6 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 disabled:from-gray-600 disabled:to-gray-600 disabled:cursor-not-allowed text-white font-semibold rounded-lg transition duration-200 flex items-center justify-center gap-2"
-            >
-              {state === 'loading' ? (
-                <>
-                  <span className="animate-spin">⏳</span>
-                  Iniciando sesión...
-                </>
-              ) : state === 'success' ? (
-                <>
-                  <span>✅</span>
-                  Acceso concedido
-                </>
-              ) : (
-                'Iniciar Sesión'
+              {error && (
+                <div className="rounded-3xl border border-red-700/40 bg-red-950/80 p-4 text-sm text-red-200">
+                  ❌ {error}
+                </div>
               )}
-            </button>
-          </form>
 
-          {/* Footer */}
-          <div className="mt-6 pt-6 border-t border-gray-800">
-            <p className="text-center text-gray-400 text-sm">
-              ¿No tienes cuenta?{' '}
-              <a href="#" className="text-indigo-400 hover:text-indigo-300 font-medium transition">
-                Regístrate aquí
-              </a>
-            </p>
+              {state === 'success' && (
+                <div className="rounded-3xl border border-emerald-500/30 bg-emerald-950/80 p-4 text-sm text-emerald-200">
+                  ✅ ¡Bienvenido! Redirigiendo...
+                </div>
+              )}
+
+              <button
+                type="submit"
+                disabled={state === 'loading' || state === 'success'}
+                className="flex w-full items-center justify-center gap-2 rounded-3xl bg-gradient-to-r from-indigo-600 to-purple-600 px-5 py-3 text-base font-semibold text-white shadow-lg shadow-indigo-500/20 transition duration-200 hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-70"
+              >
+                {state === 'loading' ? 'Iniciando sesión...' : state === 'success' ? 'Acceso concedido' : 'Iniciar sesión'}
+              </button>
+            </form>
+
+            <div className="mt-8 flex items-center justify-between text-sm text-gray-400">
+              <a href="#" className="hover:text-white transition">¿Olvidaste tu contraseña?</a>
+              <a href="#" className="text-indigo-300 hover:text-indigo-100 transition">Crear cuenta</a>
+            </div>
           </div>
-        </div>
-
-        {/* Información de desarrollo */}
-        <div className="mt-6 p-4 bg-gray-900/50 border border-gray-800 rounded-lg">
-          <p className="text-xs text-gray-500 font-mono text-center">
-            🚀 Listo para conectar a Supabase Auth
-          </p>
         </div>
       </div>
     </div>
