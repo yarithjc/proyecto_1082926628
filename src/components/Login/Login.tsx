@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import type { LoginFormData, LoginState } from './Login.types';
 
 /**
@@ -10,6 +11,7 @@ import type { LoginFormData, LoginState } from './Login.types';
  */
 
 export default function Login() {
+  const router = useRouter();
   const [formData, setFormData] = useState<LoginFormData>({
     email: '',
     password: '',
@@ -46,12 +48,26 @@ export default function Login() {
     }
 
     setState('loading');
+    setError(null);
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setState('error');
+        setError(data?.error || 'Credenciales inválidas');
+        return;
+      }
+
       setState('success');
       setFormData({ email: '', password: '' });
-      console.log('Login exitoso:', formData.email);
+      router.push('/dashboard');
     } catch (err) {
       setState('error');
       setError(err instanceof Error ? err.message : 'Error al iniciar sesión');
@@ -75,6 +91,9 @@ export default function Login() {
               </h1>
               <p className="mx-auto mt-4 max-w-xl text-sm text-slate-400 sm:text-base">
                 Un login limpio, suave y profesional para acceder a tu panel.
+              </p>
+              <p className="mx-auto mt-3 max-w-xl text-sm text-slate-500 sm:text-base">
+                Usa <span className="font-semibold text-white">admin@stockcontrol.com</span> y <span className="font-semibold text-white">Admin1234!</span> para ingresar como administrador.
               </p>
             </div>
 
