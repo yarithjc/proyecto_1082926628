@@ -2,20 +2,107 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer utilities {
-  .glow-text {
-    text-shadow: 0 0 30px #6366f1, 0 0 80px #6366f1;
-  }
+:root {
+  --color-primary: #DC2626;
+  --color-primary-dark: #B91C1C;
+  --color-primary-deep: #7F1D1D;
+  --color-primary-ink: #450A0A;
+  --color-primary-light: #FEE2E2;
+  --color-paper: #FFF8F4;
+  --color-bg: #FAFAF9;
+  --color-card: #FFFFFF;
+  --color-bg-alt: #F5F5F4;
+  --color-text: #1C1917;
+  --color-text-muted: #78716C;
+  --color-border: #E7E5E4;
+  --color-stock-ok: #16A34A;
+  --color-stock-low: #D97706;
+  --color-stock-out: #DC2626;
+  --color-seed-bg: #FEF3C7;
+  --color-seed-text: #92400E;
+  --color-seed-border: #F59E0B;
 }
 
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
+* { box-sizing: border-box; }
 
 html,
 body {
-  height: 100%;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  min-height: 100%;
 }
 
+body {
+  font-feature-settings: 'ss01', 'cv11';
+}
+
+@layer base {
+  h1, h2, h3 {
+    font-family: var(--font-display), Georgia, serif;
+    font-variation-settings: 'SOFT' 50, 'opsz' 144;
+    letter-spacing: -0.01em;
+  }
+}
+
+@layer utilities {
+  .text-brand { color: var(--color-primary); }
+  .bg-brand { background-color: var(--color-primary); }
+  .bg-brand-dark { background-color: var(--color-primary-dark); }
+  .border-brand { border-color: var(--color-primary); }
+  .font-numeric { font-family: var(--font-mono), ui-monospace, monospace; font-feature-settings: 'tnum'; }
+
+  /* Sello/eyebrow tipográfico que usaremos en headers */
+  .eyebrow {
+    font-family: var(--font-inter), sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    font-size: 11px;
+    font-weight: 600;
+  }
+
+  /* Hilo decorativo de carnicería: punteado horizontal */
+  .butcher-divider {
+    background-image: repeating-linear-gradient(
+      90deg,
+      rgba(127, 29, 29, 0.55) 0 6px,
+      transparent 6px 12px
+    );
+    height: 2px;
+  }
+
+  /* Patrón de baldosa de salsamentaría (rejilla punteada muy sutil) */
+  .tile-bg {
+    background-color: var(--color-paper);
+    background-image: radial-gradient(rgba(127, 29, 29, 0.10) 1px, transparent 1px);
+    background-size: 22px 22px;
+    background-position: 0 0;
+  }
+
+  /* Etiqueta de papel: borde dentado superior con triángulos */
+  .receipt-edge {
+    --c: var(--color-card);
+    -webkit-mask-image: linear-gradient(#000, #000),
+      linear-gradient(135deg, transparent 50%, #000 50%) 0 0 / 12px 12px repeat-x;
+  }
+
+  /* Cinta diagonal de promo/etiqueta */
+  .ribbon {
+    position: relative;
+    padding-left: 10px;
+  }
+  .ribbon::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: var(--color-primary);
+    border-radius: 2px;
+  }
+
+  .price-tag {
+    background:
+      linear-gradient(180deg, #fff, var(--color-paper));
+    border: 1px solid #f1ddd0;
+    box-shadow: 0 1px 0 rgba(255,255,255,0.7) inset, 0 1px 2px rgba(0,0,0,0.04);
+  }
+}

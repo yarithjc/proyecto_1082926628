@@ -1,0 +1,17 @@
+{
+  "version": "1.0",
+  "system_name": "StockControl",
+  "users": [
+    {
+      "email": "admin@stockcontrol.com",
+      "password_plain": "admin123",
+      "name": "Administrador",
+      "role": "admin"
+    }
+  ],
+  "products": [
+    { "name": "Salchichón", "price": 8500, "current_stock": 50 },
+    { "name": "Queso Costeño", "price": 12000, "current_stock": 30 },
+    { "name": "Mortadela", "price": 6500, "current_stock": 40 }
+  ]
+}

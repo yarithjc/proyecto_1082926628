@@ -1,8 +1,5 @@
 {
-  "app": {
-    "name": "Mi App Fullstack TS",
-    "version": "1.0.0",
-    "locale": "es-CO",
-    "theme": "dark"
-  }
+  "version": "1.0",
+  "system_name": "StockControl",
+  "locale": "es-CO"
 }

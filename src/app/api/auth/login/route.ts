@@ -1,57 +1,61 @@
-import { NextRequest, NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
-import { getSupabaseClient } from '@/lib/supabase';
+import { NextResponse } from 'next/server';
+import { SESSION_COOKIE, signSession } from '@/lib/auth';
+import { getUserByEmail, touchLastLogin } from '@/lib/dataService';
+import { recordAudit } from '@/lib/audit';
+import { loginSchema } from '@/lib/schemas';
+import { publicHandler, json } from '@/lib/withAuth';
 
-const FALLBACK_ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'admin@stockcontrol.com';
-const FALLBACK_ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'Admin1234!';
+export const dynamic = 'force-dynamic';
 
-export async function POST(request: NextRequest) {
-  const body = await request.json().catch(() => null);
-  const email = body?.email?.toString().trim().toLowerCase() ?? '';
-  const password = body?.password?.toString() ?? '';
+export const POST = publicHandler(async (req) => {
+  const body = await req.json().catch(() => null);
+  const parsed = loginSchema.safeParse(body);
+  if (!parsed.success) return json({ error: 'Credenciales inválidas' }, 400);
+  const { email, password } = parsed.data;
 
-  if (!email || !password) {
-    return NextResponse.json(
-      { error: 'Email y contraseña son obligatorios' },
-      { status: 400 }
-    );
+  const user = await getUserByEmail(email);
+  if (!user || !user.is_active) {
+    return json({ error: 'Credenciales inválidas' }, 401);
   }
+  const ok = await bcrypt.compare(password, user.password_hash);
+  if (!ok) return json({ error: 'Credenciales inválidas' }, 401);
 
-  const sb = getSupabaseClient();
-  let role: string | null = null;
+  const token = await signSession({
+    userId: user.id,
+    email: user.email,
+    role: user.role,
+    mustChangePassword: user.must_change_password,
+  });
 
-  if (sb) {
-    const { data } = await sb
-      .from('users')
-      .select('email, role, password_hash')
-      .ilike('email', email)
-      .maybeSingle();
+  await touchLastLogin(user.id);
+  await recordAudit({
+    user_id: user.id === 'seed-admin' ? null : user.id,
+    user_email: user.email,
+    user_role: user.role,
+    action: 'login',
+    entity: 'user',
+    entity_id: user.id,
+    summary: `Login de ${user.email}`,
+  });
 
-    if (data?.password_hash && (await bcrypt.compare(password, data.password_hash))) {
-      role = data.role || 'user';
-    }
-  }
-
-  if (
-    !role &&
-    email === FALLBACK_ADMIN_EMAIL.toLowerCase() &&
-    password === FALLBACK_ADMIN_PASSWORD
-  ) {
-    role = 'admin';
-  }
-
-  if (!role) {
-    return NextResponse.json({ error: 'Credenciales inválidas' }, { status: 401 });
-  }
-
-  const response = NextResponse.json({ message: 'Autenticado', role });
-  response.cookies.set('stockcontrol_session', role, {
+  const res = NextResponse.json({
+    ok: true,
+    user: {
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      role: user.role,
+      mustChangePassword: user.must_change_password,
+    },
+  });
+  res.cookies.set(SESSION_COOKIE, token, {
     httpOnly: true,
     path: '/',
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
     maxAge: 60 * 60 * 24,
   });
-
-  return response;
-}
+  res.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate');
+  return res;
+});
