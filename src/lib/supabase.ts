@@ -18,19 +18,26 @@ export function getSupabaseClient(): SupabaseClient | null {
   const url =
     process.env.SUPABASE_URL ||
     process.env.NEXT_PUBLIC_SUPABASE_URL ||
+    process.env.SUPABASE_STOCKCONTROL_SUPABASE_URL ||
+    process.env.NEXT_PUBLIC_SUPABASE_STOCKCONTROL_SUPABASE_URL ||
     process.env.VERCEL_POSTGRES_DATABASE_URL;
 
   const key =
     process.env.SUPABASE_SERVICE_ROLE_KEY ||
+    process.env.SUPABASE_STOCKCONTROL_SUPABASE_SERVICE_ROLE_KEY ||
+    process.env.SUPABASE_SECRET_KEY ||
+    process.env.SUPABASE_STOCKCONTROL_SUPABASE_SECRET_KEY ||
     process.env.SUPABASE_ANON_KEY ||
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    process.env.SUPABASE_STOCKCONTROL_SUPABASE_ANON_KEY ||
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
+    process.env.NEXT_PUBLIC_SUPABASE_STOCKCONTROL_SUPABASE_PUBLISHABLE_KEY;
 
   _checked = true;
 
   if (!url || !key) {
     console.warn(
       '[supabase] No configurado — retornando null (build-safe). ' +
-        'Variables esperadas: SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY'
+        'Variables esperadas: SUPABASE_URL / NEXT_PUBLIC_SUPABASE_URL / SUPABASE_STOCKCONTROL_SUPABASE_URL y SUPABASE_SERVICE_ROLE_KEY / SUPABASE_STOCKCONTROL_SUPABASE_SERVICE_ROLE_KEY / NEXT_PUBLIC_SUPABASE_ANON_KEY'
     );
     return null;
   }
@@ -62,7 +69,10 @@ export async function executeSql(query: string): Promise<void> {
   const connString =
     process.env.POSTGRES_URL ||
     process.env.DATABASE_URL ||
-    process.env.VERCEL_POSTGRES_URL_NONPOOLING;
+    process.env.VERCEL_POSTGRES_URL_NONPOOLING ||
+    process.env.SUPABASE_STOCKCONTROL_POSTGRES_URL_NON_POOLING ||
+    process.env.SUPABASE_STOCKCONTROL_POSTGRES_URL ||
+    process.env.SUPABASE_STOCKCONTROL_POSTGRES_PRISMA_URL;
 
   if (!connString) {
     throw new Error(
