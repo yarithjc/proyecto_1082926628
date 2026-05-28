@@ -9,7 +9,7 @@ import { useToast } from '@/components/ui/Toast';
 import { formatCOP } from '@/lib/dateUtils';
 
 interface Props {
-  onSold: (sale: SaleWithProduct, total: number, productName: string) => void;
+  onSold?: (() => void | Promise<void>) | ((sale: SaleWithProduct, total: number, productName: string) => void | Promise<void>);
 }
 
 export function SaleForm({ onSold }: Props) {
@@ -84,11 +84,14 @@ export function SaleForm({ onSold }: Props) {
         `Venta registrada · ${formatCOP(total)}`,
         `${qtyNum} × ${selected.name}`
       );
-      onSold({
-        ...j.sale,
-        product_name: selected.name,
-        seller_name: null,
-      }, total, selected.name);
+      if (onSold) {
+        const saleData = {
+          ...j.sale,
+          product_name: selected.name,
+          seller_name: null,
+        };
+        await Promise.resolve(onSold(saleData, total, selected.name) as any);
+      }
       setSelected(null);
       setQuery('');
       setQty('1');

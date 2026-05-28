@@ -97,7 +97,7 @@ export function SalesClient() {
             <span className="text-[11px] text-stone-500 font-numeric">{new Date().toLocaleDateString('es-CO')}</span>
           </div>
           <CardBody>
-            <SaleForm onSold={() => load()} />
+            <SaleForm onSold={load} />
           </CardBody>
         </Card>
 
