@@ -76,6 +76,10 @@ export interface RegisterSaleRequest {
   quantity: number;
 }
 
+export interface UpdateSaleRequest {
+  quantity?: number;
+}
+
 export interface SaleFilters {
   from?: string;
   to?: string;

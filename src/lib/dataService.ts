@@ -12,6 +12,7 @@ import {
   type Product,
   type ProductFilters,
   type RegisterSaleRequest,
+  type UpdateSaleRequest,
   type Role,
   type SafeUser,
   type Sale,
@@ -496,6 +497,165 @@ export async function getDailySummary(): Promise<DailySummary> {
     totalIncome,
     topProduct,
   };
+}
+
+export async function deleteSale(
+  actor: { id: string; email: string; role: Role },
+  saleId: string
+): Promise<void> {
+  const sb = getSupabaseClient();
+  if (!sb) throw new AppError(503, 'Supabase no disponible');
+
+  // Get the sale to restore stock
+  const { data: sale, error: saleError } = await sb
+    .from('sales')
+    .select('*')
+    .eq('id', saleId)
+    .maybeSingle();
+  if (saleError || !sale) {
+    throw new NotFoundError('Venta no encontrada');
+  }
+
+  // Get the product to restore its stock
+  const { data: product, error: productError } = await sb
+    .from('products')
+    .select('current_stock')
+    .eq('id', (sale as Sale).product_id)
+    .maybeSingle();
+  if (productError || !product) {
+    throw new NotFoundError('Producto no encontrado');
+  }
+
+  // Restore stock
+  const { error: updateError } = await sb
+    .from('products')
+    .update({
+      current_stock: product.current_stock + (sale as Sale).quantity,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', (sale as Sale).product_id);
+  if (updateError) throw new AppError(500, updateError.message);
+
+  // Delete the sale
+  const { error: deleteError } = await sb
+    .from('sales')
+    .delete()
+    .eq('id', saleId);
+  if (deleteError) {
+    // Rollback stock restoration
+    await sb
+      .from('products')
+      .update({ current_stock: product.current_stock, updated_at: new Date().toISOString() })
+      .eq('id', (sale as Sale).product_id);
+    throw new AppError(500, deleteError.message);
+  }
+
+  await recordAudit({
+    user_id: actor.id,
+    user_email: actor.email,
+    user_role: actor.role,
+    action: 'delete_sale',
+    entity: 'sale',
+    entity_id: saleId,
+    summary: `Venta eliminada y stock restaurado: ${(sale as Sale).quantity} unidades`,
+    metadata: { product_id: (sale as Sale).product_id, quantity: (sale as Sale).quantity },
+  });
+}
+
+export async function updateSale(
+  actor: { id: string; email: string; role: Role },
+  saleId: string,
+  data: UpdateSaleRequest
+): Promise<Sale> {
+  const sb = getSupabaseClient();
+  if (!sb) throw new AppError(503, 'Supabase no disponible');
+
+  if (data.quantity !== undefined && data.quantity < 1) {
+    throw new BadRequestError('La cantidad debe ser mayor a 0');
+  }
+
+  // Get the sale
+  const { data: sale, error: saleError } = await sb
+    .from('sales')
+    .select('*')
+    .eq('id', saleId)
+    .maybeSingle();
+  if (saleError || !sale) {
+    throw new NotFoundError('Venta no encontrada');
+  }
+
+  const saleData = sale as Sale;
+  const oldQuantity = saleData.quantity;
+  const newQuantity = data.quantity ?? oldQuantity;
+  const quantityDifference = newQuantity - oldQuantity;
+
+  // If quantity changed, check and update stock
+  if (quantityDifference !== 0) {
+    const { data: product, error: productError } = await sb
+      .from('products')
+      .select('current_stock')
+      .eq('id', saleData.product_id)
+      .maybeSingle();
+    if (productError || !product) {
+      throw new NotFoundError('Producto no encontrado');
+    }
+
+    if (quantityDifference > 0 && product.current_stock < quantityDifference) {
+      throw new ConflictError('Stock insuficiente para aumentar la cantidad');
+    }
+
+    // Update stock
+    const { error: stockError } = await sb
+      .from('products')
+      .update({
+        current_stock: product.current_stock - quantityDifference,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', saleData.product_id);
+    if (stockError) throw new AppError(500, stockError.message);
+  }
+
+  // Update the sale
+  const newTotal = Number(saleData.unit_price) * newQuantity;
+  const { data: updated, error: updateError } = await sb
+    .from('sales')
+    .update({ quantity: newQuantity, total: newTotal, updated_at: new Date().toISOString() })
+    .eq('id', saleId)
+    .select('*')
+    .single();
+  if (updateError) {
+    // Rollback stock if we updated it
+    if (quantityDifference !== 0) {
+      const { data: product } = await sb
+        .from('products')
+        .select('current_stock')
+        .eq('id', saleData.product_id)
+        .maybeSingle();
+      if (product) {
+        await sb
+          .from('products')
+          .update({
+            current_stock: product.current_stock + quantityDifference,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', saleData.product_id);
+      }
+    }
+    throw new AppError(500, updateError.message);
+  }
+
+  await recordAudit({
+    user_id: actor.id,
+    user_email: actor.email,
+    user_role: actor.role,
+    action: 'update_sale',
+    entity: 'sale',
+    entity_id: saleId,
+    summary: `Venta actualizada: ${oldQuantity} → ${newQuantity} unidades`,
+    metadata: { product_id: saleData.product_id, old_quantity: oldQuantity, new_quantity: newQuantity },
+  });
+
+  return updated as Sale;
 }
 
 export async function getDashboardData(): Promise<DashboardData> {

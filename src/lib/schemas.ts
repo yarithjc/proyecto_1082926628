@@ -40,3 +40,7 @@ export const registerSaleSchema = z.object({
   productId: z.string().uuid(),
   quantity: z.number().int().min(1),
 });
+
+export const updateSaleSchema = z.object({
+  quantity: z.number().int().min(1).optional(),
+});
