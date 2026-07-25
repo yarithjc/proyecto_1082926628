@@ -5,6 +5,12 @@ export const loginSchema = z.object({
   password: z.string().min(1),
 });
 
+export const signupSchema = z.object({
+  name: z.string().min(2).max(100),
+  email: z.string().email(),
+  password: z.string().min(6, 'Mínimo 6 caracteres'),
+});
+
 export const changePasswordSchema = z.object({
   currentPassword: z.string().min(1),
   newPassword: z.string().min(8, 'Mínimo 8 caracteres'),

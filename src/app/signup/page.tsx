@@ -2,40 +2,56 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { LogIn, Mail, Lock, AlertCircle } from 'lucide-react';
+import { UserPlus, Mail, Lock, User, AlertCircle } from 'lucide-react';
 import { Logo } from '@/components/ui/Logo';
 import { useToast } from '@/components/ui/Toast';
 
-export default function LoginPage() {
+export default function SignupPage() {
   const router = useRouter();
   const toast = useToast();
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
+
+    // Validaciones
+    if (!name.trim()) {
+      setError('El nombre es obligatorio');
+      return;
+    }
+    if (!email.trim()) {
+      setError('El correo es obligatorio');
+      return;
+    }
+    if (password.length < 6) {
+      setError('La contraseña debe tener al menos 6 caracteres');
+      return;
+    }
+    if (password !== confirmPassword) {
+      setError('Las contraseñas no coinciden');
+      return;
+    }
+
     setLoading(true);
     try {
-      const res = await fetch('/api/auth/login', {
+      const res = await fetch('/api/auth/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ name, email, password }),
       });
       const json = await res.json();
       if (!res.ok) {
-        setError(json.error ?? 'Credenciales inválidas');
+        setError(json.error ?? 'No se pudo crear la cuenta');
         return;
       }
-      toast.success(`Bienvenido, ${json.user?.name ?? 'usuario'}`);
-      if (json.user?.mustChangePassword) {
-        router.push('/profile?force=1');
-      } else {
-        router.push('/dashboard');
-      }
-      router.refresh();
+      toast.success('¡Cuenta creada exitosamente!');
+      router.push('/login');
     } catch {
       setError('No se pudo conectar al servidor');
     } finally {
@@ -59,7 +75,7 @@ export default function LoginPage() {
         className="absolute inset-0 opacity-[0.18] mix-blend-overlay pointer-events-none bg-paper-grain"
       />
 
-      {/* Sello decorativo: "salsamentaría" en script alrededor de la tarjeta */}
+      {/* Sello decorativo */}
       <div className="absolute top-6 left-6 right-6 flex items-center justify-between text-[10.5px] tracking-[0.32em] uppercase text-red-200/60 font-semibold">
         <span>Est. 2026</span>
         <span>Inv & ventas</span>
@@ -81,12 +97,32 @@ export default function LoginPage() {
               StockControl
             </h1>
             <p className="text-[13px] text-stone-500 mt-2">
-              Inventario y ventas <span className="text-brand font-medium">para tu negocio.</span>
+              Crea tu <span className="text-brand font-medium">nueva cuenta</span>
             </p>
             <div className="butcher-divider w-24 mt-4" />
           </div>
 
           <div className="space-y-4">
+            <label className="block">
+              <span className="block text-[11px] uppercase tracking-[0.18em] font-semibold text-stone-500 mb-1.5">
+                Nombre
+              </span>
+              <div className="relative">
+                <User
+                  size={16}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400 pointer-events-none"
+                />
+                <input
+                  type="text"
+                  required
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="w-full pl-9 pr-3 py-2.5 rounded-lg border border-stone-300 text-stone-900 placeholder:text-stone-400 focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/30 transition"
+                  placeholder="Tu nombre completo"
+                />
+              </div>
+            </label>
+
             <label className="block">
               <span className="block text-[11px] uppercase tracking-[0.18em] font-semibold text-stone-500 mb-1.5">
                 Correo
@@ -98,12 +134,12 @@ export default function LoginPage() {
                 />
                 <input
                   type="email"
-                  autoComplete="username"
+                  autoComplete="email"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="w-full pl-9 pr-3 py-2.5 rounded-lg border border-stone-300 text-stone-900 placeholder:text-stone-400 focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/30 transition"
-                  placeholder="admin@stockcontrol.com"
+                  placeholder="tu@email.com"
                 />
               </div>
             </label>
@@ -119,10 +155,31 @@ export default function LoginPage() {
                 />
                 <input
                   type="password"
-                  autoComplete="current-password"
+                  autoComplete="new-password"
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
+                  className="w-full pl-9 pr-3 py-2.5 rounded-lg border border-stone-300 text-stone-900 placeholder:text-stone-400 focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/30 transition"
+                  placeholder="••••••••"
+                />
+              </div>
+            </label>
+
+            <label className="block">
+              <span className="block text-[11px] uppercase tracking-[0.18em] font-semibold text-stone-500 mb-1.5">
+                Confirmar contraseña
+              </span>
+              <div className="relative">
+                <Lock
+                  size={16}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400 pointer-events-none"
+                />
+                <input
+                  type="password"
+                  autoComplete="new-password"
+                  required
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
                   className="w-full pl-9 pr-3 py-2.5 rounded-lg border border-stone-300 text-stone-900 placeholder:text-stone-400 focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/30 transition"
                   placeholder="••••••••"
                 />
@@ -141,22 +198,22 @@ export default function LoginPage() {
               disabled={loading}
               className="w-full py-3 rounded-lg bg-brand hover:bg-brand-dark text-white font-semibold transition disabled:opacity-60 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2 shadow-[0_4px_0_0_#7F1D1D] hover:shadow-[0_2px_0_0_#7F1D1D] hover:translate-y-[2px]"
             >
-              <LogIn size={16} />
-              {loading ? 'Ingresando…' : 'Ingresar'}
+              <UserPlus size={16} />
+              {loading ? 'Creando…' : 'Crear cuenta'}
             </button>
           </div>
 
           <div className="mt-6 pt-6 border-t border-stone-200 text-center">
-            <p className="text-[13px] text-stone-600 mb-3">
-              ¿No tienes cuenta?
+            <p className="text-[13px] text-stone-600">
+              ¿Ya tienes cuenta?{' '}
+              <button
+                type="button"
+                onClick={() => router.push('/login')}
+                className="text-brand font-semibold hover:underline"
+              >
+                Inicia sesión aquí
+              </button>
             </p>
-            <button
-              type="button"
-              onClick={() => router.push('/signup')}
-              className="w-full py-2.5 rounded-lg border-2 border-brand text-brand hover:bg-brand-light/30 font-semibold transition inline-flex items-center justify-center gap-2"
-            >
-              Crear nueva cuenta
-            </button>
           </div>
 
           <p className="text-center text-[11px] text-stone-400 mt-6 uppercase tracking-[0.18em]">
